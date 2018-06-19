@@ -4,7 +4,7 @@
 		module="play-scala-slick-example_2.12"
 		revision="2.6.x"
 		status="integration"
-		publication="20180619022840"
+		publication="20180619153831"
 	>
 		<description>
 		play-scala-slick-example

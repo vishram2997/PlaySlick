@@ -1,6 +1,6 @@
 // @GENERATOR:play-routes-compiler
-// @SOURCE:C:/Users/vsingh/Desktop/Vishram/Scala/play-scala-slick-example/conf/routes
-// @DATE:Tue Jun 19 02:24:58 EDT 2018
+// @SOURCE:C:/Users/vsingh/Desktop/Vishram/Scala/PlaySlick/conf/routes
+// @DATE:Tue Jun 19 16:58:01 EDT 2018
 
 
 package router {

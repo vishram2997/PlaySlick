@@ -1,6 +1,6 @@
 // @GENERATOR:play-routes-compiler
-// @SOURCE:C:/Users/vsingh/Desktop/Vishram/Scala/play-scala-slick-example/conf/routes
-// @DATE:Tue Jun 19 02:24:58 EDT 2018
+// @SOURCE:C:/Users/vsingh/Desktop/Vishram/Scala/PlaySlick/conf/routes
+// @DATE:Tue Jun 19 16:58:01 EDT 2018
 
 import play.api.routing.JavaScriptReverseRoute
 
@@ -18,12 +18,12 @@ package controllers.javascript {
     }
 
   
-    // @LINE:8
-    def getPersons: JavaScriptReverseRoute = JavaScriptReverseRoute(
-      "controllers.PersonController.getPersons",
+    // @LINE:11
+    def update: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.PersonController.update",
       """
-        function() {
-          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "persons"})
+        function(id0,name1,age2) {
+          return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "update(" + encodeURIComponent((""" + implicitly[play.api.mvc.PathBindable[Long]].javascriptUnbind + """)("id", id0)) + "," + encodeURIComponent((""" + implicitly[play.api.mvc.PathBindable[String]].javascriptUnbind + """)("name", name1)) + "," + encodeURIComponent((""" + implicitly[play.api.mvc.PathBindable[Int]].javascriptUnbind + """)("age", age2)) + ")"})
         }
       """
     )
@@ -34,6 +34,26 @@ package controllers.javascript {
       """
         function(name0,age1) {
           return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "addPerson(" + encodeURIComponent((""" + implicitly[play.api.mvc.PathBindable[String]].javascriptUnbind + """)("name", name0)) + "," + encodeURIComponent((""" + implicitly[play.api.mvc.PathBindable[Int]].javascriptUnbind + """)("age", age1)) + ")"})
+        }
+      """
+    )
+  
+    // @LINE:10
+    def deletePerson: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.PersonController.deletePerson",
+      """
+        function(id0) {
+          return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "remove(" + encodeURIComponent((""" + implicitly[play.api.mvc.PathBindable[Long]].javascriptUnbind + """)("id", id0)) + ")"})
+        }
+      """
+    )
+  
+    // @LINE:8
+    def getPersons: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.PersonController.getPersons",
+      """
+        function() {
+          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "persons"})
         }
       """
     )
@@ -50,7 +70,7 @@ package controllers.javascript {
   
   }
 
-  // @LINE:12
+  // @LINE:14
   class ReverseAssets(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -58,7 +78,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:12
+    // @LINE:14
     def versioned: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.Assets.versioned",
       """

@@ -4,9 +4,11 @@
 
 # Home page
 GET     /                           controllers.PersonController.index
-#POST    /person                     controllers.PersonController.addPerson
+#POST    /person                    controllers.PersonController.addPerson
 GET     /persons                    controllers.PersonController.getPersons
-POST    /addPerson(:name,:age)                    controllers.PersonController.addNew(name:String, age: Int)
+POST    /addPerson(:name,:age)      controllers.PersonController.addNew(name:String, age: Int)
+POST    /remove(:id)                controllers.PersonController.deletePerson(id:Long)
+POST    /update(:id,:name,:age)     controllers.PersonController.update(id:Long,name:String, age: Int)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

@@ -1,6 +1,6 @@
 // @GENERATOR:play-routes-compiler
-// @SOURCE:C:/Users/vsingh/Desktop/Vishram/Scala/play-scala-slick-example/conf/routes
-// @DATE:Tue Jun 19 02:24:58 EDT 2018
+// @SOURCE:C:/Users/vsingh/Desktop/Vishram/Scala/PlaySlick/conf/routes
+// @DATE:Tue Jun 19 16:58:01 EDT 2018
 
 import play.api.mvc.Call
 
@@ -17,16 +17,28 @@ package controllers {
     }
 
   
-    // @LINE:8
-    def getPersons(): Call = {
+    // @LINE:11
+    def update(id:Long, name:String, age:Int): Call = {
       
-      Call("GET", _prefix + { _defaultPrefix } + "persons")
+      Call("POST", _prefix + { _defaultPrefix } + "update(" + play.core.routing.dynamicString(implicitly[play.api.mvc.PathBindable[Long]].unbind("id", id)) + "," + play.core.routing.dynamicString(implicitly[play.api.mvc.PathBindable[String]].unbind("name", name)) + "," + play.core.routing.dynamicString(implicitly[play.api.mvc.PathBindable[Int]].unbind("age", age)) + ")")
     }
   
     // @LINE:9
     def addNew(name:String, age:Int): Call = {
       
       Call("POST", _prefix + { _defaultPrefix } + "addPerson(" + play.core.routing.dynamicString(implicitly[play.api.mvc.PathBindable[String]].unbind("name", name)) + "," + play.core.routing.dynamicString(implicitly[play.api.mvc.PathBindable[Int]].unbind("age", age)) + ")")
+    }
+  
+    // @LINE:10
+    def deletePerson(id:Long): Call = {
+      
+      Call("POST", _prefix + { _defaultPrefix } + "remove(" + play.core.routing.dynamicString(implicitly[play.api.mvc.PathBindable[Long]].unbind("id", id)) + ")")
+    }
+  
+    // @LINE:8
+    def getPersons(): Call = {
+      
+      Call("GET", _prefix + { _defaultPrefix } + "persons")
     }
   
     // @LINE:6
@@ -37,14 +49,14 @@ package controllers {
   
   }
 
-  // @LINE:12
+  // @LINE:14
   class ReverseAssets(_prefix: => String) {
     def _defaultPrefix: String = {
       if (_prefix.endsWith("/")) "" else "/"
     }
 
   
-    // @LINE:12
+    // @LINE:14
     def versioned(file:Asset): Call = {
       implicit lazy val _rrc = new play.core.routing.ReverseRouteContext(Map(("path", "/public"))); _rrc
       Call("GET", _prefix + { _defaultPrefix } + "assets/" + implicitly[play.api.mvc.PathBindable[Asset]].unbind("file", file))

@@ -3,8 +3,10 @@ package models
 import javax.inject.{ Inject, Singleton }
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
-
+import play.api.libs.json._
 import scala.concurrent.{ Future, ExecutionContext }
+
+
 
 /**
  * A repository for people.
@@ -20,7 +22,15 @@ class PersonRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impl
   // The second one brings the Slick DSL into scope, which lets you define the table and other queries.
   import dbConfig._
   import profile.api._
+  // Person Class End
 
+  case class Person(id: Long, name: String, age: Int)
+
+  object Person {  
+    implicit val personFormat = Json.format[Person]
+  }
+
+//Person Model End
   /**
    * Here we define the table. It will have a name of people
    */
@@ -75,4 +85,27 @@ class PersonRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impl
   def list(): Future[Seq[Person]] = db.run {
     people.result
   }
+
+  /*
+  * Delete by id or 0 for all
+  */
+
+  def deletePerson(id: Long): Future[Int]  = db.run {
+    if(id != 0)
+      people.filter(_.id === id).delete
+    else
+      people.delete
+
+  }
+
+  /*
+  Update record
+  */
+  def update(id: Long, name: String, age: Int): Future[Int]  = db.run {
+    people.filter(_.id === id).map(ab => (ab.name , ab.age)).update((name,age))
+    
+
+  }
+
+
 }

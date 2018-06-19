@@ -55,6 +55,19 @@ class PersonController @Inject()(repo: PersonRepository,
       Ok(Json.toJson(people))
     }
   }
+
+  def deletePerson(id: Long) = Action.async { implicit request =>
+    repo.deletePerson(id).map { people =>
+      Ok(people +" record deleted")
+    }
+  }
+
+  def update(id: Long, name: String, age: Int) = Action.async { implicit request =>
+    repo.update(id,name,age).map { people =>
+      Ok(people +" record Updated")
+    }
+  }
+
 }
 
 /**
