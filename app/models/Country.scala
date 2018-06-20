@@ -14,7 +14,8 @@ import scala.concurrent.{ Future, ExecutionContext }
  * @param dbConfigProvider The Play db config provider. Play will inject this for you.
  */
 @Singleton
-class Country @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
+class Country @Inject() (dbConfigProvider: DatabaseConfigProvider,
+                         currencies: Currency)(implicit ec: ExecutionContext) {
   // We want the JdbcProfile for this provider
   private val dbConfig = dbConfigProvider.get[JdbcProfile]
 
@@ -22,6 +23,7 @@ class Country @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: 
   // The second one brings the Slick DSL into scope, which lets you define the table and other queries.
   import dbConfig._
   import profile.api._
+
   // Country Class End
 
   case class Country(id: String, name: String, iso: String, currency:String)
@@ -39,20 +41,20 @@ class Country @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: 
     def name = column[String]("name", O.Default(""))
     def iso = column[String]("iso", O.Default(""))
     def currency = column[String]("currency", O.Default(""))
-    def currencyFK =    foreignKey("curr_fk", id, currency)(_.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Cascade)
+    def currencyFK =    foreignKey("curr_fk", currency, currencies.currency)(_.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Cascade)
 
     def * = (id, name, iso,currency) <> ((Country.apply _).tupled, Country.unapply)
   }
 
- 
-  private val country = TableQuery[CountryTable]
+
+   val country = TableQuery[CountryTable]
 
   /**
    Add new record
    */
-  def create(id: String, name: String, iso: String, currency:String): Future[Country] = db.run {
+  def create(id: String, name: String, iso: String, _currency:String): Future[Country] = db.run {
     // We create a projection of just the name and age columns, since we're not inserting a value for the id column
-    country += (id, name, iso,currency)
+    country += (id, name, iso,_currency)
   }
 
   /**

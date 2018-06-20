@@ -43,7 +43,7 @@ class Currency @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec:
   }
 
  
-  private val currency = TableQuery[CurrencyTable]
+   val currency = TableQuery[CurrencyTable]
 
   /**
    Add new record
