@@ -1,4 +1,0 @@
-[0m[[0m[31merror[0m] [0m[0mC:\Users\vsingh\Desktop\Vishram\Scala\PlaySlick\app\models\PersonRepository.scala:105:55: too many arguments (2) for method map: (f: PersonRepository.this.PeopleTable => F)(implicit shape: slick.lifted.Shape[_ <: slick.lifted.FlatShapeLevel, F, T, G])slick.lifted.Query[G,T,Seq][0m
-[0m[[0m[31merror[0m] [0m[0m    people.filter(_.id === id).map(ab => ab.name , ab.age).update((name,age))[0m
-[0m[[0m[31merror[0m] [0m[0m                                                      ^[0m
-[0m[[0m[31merror[0m] [0m[0mone error found[0m
