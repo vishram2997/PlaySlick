@@ -47,21 +47,22 @@ class Country @Inject() (dbConfigProvider: DatabaseConfigProvider,
   }
 
 
-   val country = TableQuery[CountryTable]
+   val countries = TableQuery[CountryTable]
 
   /**
    Add new record
    */
-  def create(id: String, name: String, iso: String, _currency:String): Future[Country] = db.run {
+  def create(id: String, name: String, iso: String, currency:String): Future[Seq[Country]] = db.run {
     // We create a projection of just the name and age columns, since we're not inserting a value for the id column
-    country += (id, name, iso,_currency)
+    countries ++= Seq(Country(id, name, iso,currency))
+    countries.result
   }
 
   /**
    * List all the record in the database.
    */
   def read(): Future[Seq[Country]] = db.run {
-    country.result
+    countries.result
   }
 
   /*
@@ -70,15 +71,15 @@ class Country @Inject() (dbConfigProvider: DatabaseConfigProvider,
 
   def delete(id: String): Future[Int]  = db.run {
     if(id != "")
-      country.filter(_.id === "").delete
+      countries.filter(_.id === "").delete
     else
-      country.delete
+      countries.delete
   }
 
   /*
   Update record
   */
   def update(id: String, name: String, iso: String, currency:String): Future[Int]  = db.run {
-    country.filter(_.id === id).map(ab => (ab.name , ab.iso,ab.currency)).update((name,iso,currency))
+    countries.filter(_.id === id).map(ab => (ab.name , ab.iso,ab.currency)).update((name,iso,currency))
   }
 }
