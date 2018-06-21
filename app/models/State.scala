@@ -14,9 +14,12 @@ import scala.concurrent.{ Future, ExecutionContext }
  * @param dbConfigProvider The Play db config provider. Play will inject this for you.
  */
 @Singleton
-class State @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
+class State @Inject() (dbConfigProvider: DatabaseConfigProvider,
+                       country: Country,timezone: Timezone)(implicit ec: ExecutionContext) {
   // We want the JdbcProfile for this provider
-  private val dbConfig = dbConfigProvider.get[JdbcProfile]
+  val dbConfig = dbConfigProvider.get[JdbcProfile]
+  val countryVar:Country = country
+  val timezoneVar:Timezone = timezone
 
   // These imports are important, the first one brings db into scope, which will let you do the actual db operations.
   // The second one brings the Slick DSL into scope, which lets you define the table and other queries.
@@ -27,21 +30,21 @@ class State @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: Ex
   case class State(id: String, name: String, country: String, timeZone:String)
 
   object State {  
-    implicit val StateFormat = Json.format[State]
+    implicit val StateFormat:OFormat[State] = Json.format[State]
   }
 
 //State Model End
   /**
    * Here we define the table. It will have a name of people
    */
-  private class StateTable(tag: Tag) extends Table[State](tag, "state") {
+   class StateTable(tag: Tag) extends Table[State](tag, "state") {
     def id = column[String]("id", O.PrimaryKey, O.Default(""))
     def name = column[String]("name", O.Default(""))
     def country = column[String]("country", O.Default(""))
     def timeZone = column[String]("timeZone", O.Default(""))
 
-    def countryFK =    foreignKey("country_fk", id, country)(_.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Cascade)
-    def timezoneFK =    foreignKey("timezone_fk", id, timezone)(_.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Restrict)
+    def countryFK =    foreignKey("country_fk", id, countryVar.getCountry)(_.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Cascade)
+    def timezoneFK =    foreignKey("timezone_fk", id, timezoneVar.getTimezone)(_.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Restrict)
 
     def * = (id, name, country,timeZone) <> ((State.apply _).tupled, State.unapply)
   }
@@ -49,12 +52,18 @@ class State @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: Ex
  
   private val state = TableQuery[StateTable]
 
+
+  // create table schema
+  def createTable:Future[Unit]= db.run {
+    state.schema.create
+  }
+
   /**
    Add new record
    */
-  def create(id: String, name: String, country: String, timeZone:String): Future[State] = db.run {
+  def create(id: String, name: String, country: String, timeZone:String): Future[Int] = db.run {
     // We create a projection of just the name and age columns, since we're not inserting a value for the id column
-    state += (id, name, country,timeZone)
+    state += State(id, name, country,timeZone)
   }
 
   /**

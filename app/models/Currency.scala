@@ -16,7 +16,7 @@ import scala.concurrent.{ Future, ExecutionContext }
 @Singleton
 class Currency @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
   // We want the JdbcProfile for this provider
-  private val dbConfig = dbConfigProvider.get[JdbcProfile]
+  val dbConfig = dbConfigProvider.get[JdbcProfile]
 
   // These imports are important, the first one brings db into scope, which will let you do the actual db operations.
   // The second one brings the Slick DSL into scope, which lets you define the table and other queries.
@@ -27,14 +27,14 @@ class Currency @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec:
   case class Currency(id: String, name: String, iso: String)
 
   object Currency {  
-    implicit val CurrencyFormat = Json.format[Currency]
+    implicit val CurrencyFormat:OFormat[Currency] = Json.format[Currency]
   }
 
 //Currency Model End
   /**
    * Here we define the table. It will have a name of people
    */
-  private class CurrencyTable(tag: Tag) extends Table[Currency](tag, "currency") {
+   class CurrencyTable(tag: Tag) extends Table[Currency](tag, "currency") {
     def id = column[String]("id", O.PrimaryKey, O.Default(""))
     def name = column[String]("name", O.Default(""))
     def iso = column[String]("iso", O.Default(""))
@@ -42,15 +42,25 @@ class Currency @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec:
     def * = (id, name, iso) <> ((Currency.apply _).tupled, Currency.unapply)
   }
 
- 
-   val currency = TableQuery[CurrencyTable]
 
+  private val currency = TableQuery[CurrencyTable]
+
+  def getCurrency = {
+    TableQuery[CurrencyTable]
+  }
+
+
+  // create table schema
+  def createTable():Future[Unit] = db.run {
+    currency.schema.create
+
+  }
   /**
    Add new record
    */
-  def create(id: String, name: String, iso: String): Future[Currency] = db.run {
+  def create(id: String, name: String, iso: String): Future[Int] = db.run {
     // We create a projection of just the name and age columns, since we're not inserting a value for the id column
-    currency += (id, name, iso)
+    currency += Currency(id, name, iso)
   }
 
   /**

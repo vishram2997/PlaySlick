@@ -17,29 +17,14 @@ class PersonController @Inject()(repo: PersonRepository,
                                 )(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
 
-  /**
-   * The mapping for the person form.
-   */
-  val personForm: Form[CreatePersonForm] = Form {
-    mapping(
-      "name" -> nonEmptyText,
-      "age" -> number.verifying(min(0), max(140))
-    )(CreatePersonForm.apply)(CreatePersonForm.unapply)
-  }
 
-  /**
-   * The index action.
-   */
-  def index = Action { implicit request =>
-    Ok("done")
-  }
 
   /**
    * The add person action.
    *
    * This is asynchronous, since we're invoking the asynchronous methods on PersonRepository.
    */
-  def addNew(name:String,age:Int) = Action.async {
+  def addNew(name:String,age:Int) :Action[AnyContent] = Action.async {
     implicit request =>
     repo.create(name, age).map {people =>
       Ok(Json.toJson(people))
@@ -50,19 +35,19 @@ class PersonController @Inject()(repo: PersonRepository,
   /**
    * A REST endpoint that gets all the people as JSON.
    */
-  def getPersons = Action.async { implicit request =>
+  def getPersons:Action[AnyContent] = Action.async { implicit request =>
     repo.list().map { people =>
       Ok(Json.toJson(people))
     }
   }
 
-  def deletePerson(id: Long) = Action.async { implicit request =>
+  def deletePerson(id: Long):Action[AnyContent] = Action.async { implicit request =>
     repo.deletePerson(id).map { people =>
       Ok(people +" record deleted")
     }
   }
 
-  def update(id: Long, name: String, age: Int) = Action.async { implicit request =>
+  def update(id: Long, name: String, age: Int):Action[AnyContent] = Action.async { implicit request =>
     repo.update(id,name,age).map { people =>
       Ok(people +" record Updated")
     }
