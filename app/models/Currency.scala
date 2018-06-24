@@ -1,10 +1,12 @@
 package models
 
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import play.api.libs.json._
-import scala.concurrent.{ Future, ExecutionContext }
+import slick.jdbc.meta.MTable
+
+import scala.concurrent.{ExecutionContext, Future}
 
 
 
@@ -51,9 +53,12 @@ class Currency @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec:
 
 
   // create table schema
-  def createTable():Future[Unit] = db.run {
-    currency.schema.create
-
+  def createTable():Future[Unit]= db.run {DBIO.seq(
+    MTable.getTables map (tables => {
+      if (!tables.exists(_.name.name == currency.baseTableRow.tableName))
+        currency.schema.create
+    })
+  )
   }
   /**
    Add new record

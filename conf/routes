@@ -4,12 +4,14 @@
 
 # Home page
 #POST    /person                    controllers.PersonController.addPerson
+POST    /createSchema               controllers.AppController.createTables
+
 GET     /persons                    controllers.PersonController.getPersons
 POST    /addPerson(:name,:age)      controllers.PersonController.addNew(name:String, age: Int)
 POST    /remove(:id)                controllers.PersonController.deletePerson(id:Long)
 POST    /update(:id,:name,:age)     controllers.PersonController.update(id:Long,name:String, age: Int)
 
-GET     /currencies               controllers.CurrencyController.read
+GET     /currencies                 controllers.CurrencyController.read
 POST    /currency/createTable       controllers.CurrencyController.createTable
 POST    /currency/create            controllers.CurrencyController.create
 POST    /currency/update            controllers.CurrencyController.update

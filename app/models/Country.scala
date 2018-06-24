@@ -6,6 +6,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import play.api.libs.json._
+import slick.jdbc.meta.MTable
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -24,6 +25,8 @@ class Country @Inject() (dbConfigProvider: DatabaseConfigProvider,
   // The second one brings the Slick DSL into scope, which lets you define the table and other queries.
   import dbConfig._
   import profile.api._
+
+
 
   // Country Class End
 
@@ -58,8 +61,12 @@ class Country @Inject() (dbConfigProvider: DatabaseConfigProvider,
   }
 
   // create table schema
-  def createTable:Future[Unit] = db.run {
-    countries.schema.create
+  def createTable():Future[Unit]= db.run {DBIO.seq(
+    MTable.getTables map (tables => {
+      if (!tables.exists(_.name.name == countries.baseTableRow.tableName))
+        countries.schema.create
+    })
+  )
   }
   /**
    Add new record

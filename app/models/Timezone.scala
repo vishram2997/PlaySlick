@@ -1,10 +1,13 @@
 package models
 
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
+import slick.jdbc.meta.MTable
 import play.api.libs.json._
-import scala.concurrent.{ Future, ExecutionContext }
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{ExecutionContext, Future}
 
 
 
@@ -34,7 +37,7 @@ class Timezone @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec:
   /**
    * Here we define the table. It will have a name of people
    */
-   class TimezoneTable(tag: Tag) extends Table[Timezone](tag, "timezone") {
+   class TimezoneTable(tag: Tag) extends Table[Timezone](tag, _tableName="timezone") {
     def id = column[String]("id", O.PrimaryKey, O.Default(""))
     def name = column[String]("name", O.Default(""))
     def enuName = column[String]("enuName", O.Default(""))
@@ -48,9 +51,15 @@ class Timezone @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec:
     timezone
   }
 
+
+
   // create table schema
-  def createTable():Future[Unit]= db.run {
-    timezone.schema.create
+  def createTable():Future[Unit]= db.run {DBIO.seq(
+    MTable.getTables map (tables => {
+      if (!tables.exists(_.name.name == timezone.baseTableRow.tableName))
+        timezone.schema.create
+    })
+  )
   }
   /**
    Add new record
