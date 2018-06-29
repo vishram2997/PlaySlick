@@ -1,0 +1,5 @@
+Name,FieldId,Type,PK,Default
+Country,Id,String,Id,""""""
+Country,Name,String,,""""""
+Country,ISO,String,,""""""
+Country,Currency,String,,""""""
