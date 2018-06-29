@@ -7,59 +7,59 @@ import play.api.libs.json._
 import slick.jdbc.meta.MTable
 import scala.concurrent.{ExecutionContext, Future}
 /**
- * A repository for State.
+ * A repository for PostCode.
  *
  * @param dbConfigProvider The Play db config provider. Play will inject this for you.
 */
 @Singleton
-class State @Inject() (dbConfigProvider: DatabaseConfigProvider
+class PostCode @Inject() (dbConfigProvider: DatabaseConfigProvider
                          )(implicit ec: ExecutionContext) {
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   import dbConfig._
   import profile.api._
-  case class State(Id:String ,Name:String ,Country:String ,Currency:String ,Timezone:String)
-  object State {
-    implicit val StateFormat:OFormat[State] = Json.format[State]
+  case class PostCode(Id:String ,Name:String ,City:String ,State:String ,Country:String)
+  object PostCode {
+    implicit val PostCodeFormat:OFormat[PostCode] = Json.format[PostCode]
   }
 
-  class StateTable(tag: Tag) extends Table[State](tag, "state") {
+  class PostCodeTable(tag: Tag) extends Table[PostCode](tag, "postcode") {
     def Id = column[String]("Id", O.PrimaryKey, O.Default(""))
   def Name = column[String]("Name", O.Default(""))
+  def City = column[String]("City", O.Default(""))
+  def State = column[String]("State", O.Default(""))
   def Country = column[String]("Country", O.Default(""))
-  def Currency = column[String]("Currency", O.Default(""))
-  def Timezone = column[String]("Timezone", O.Default(""))
 
-    def * = (Id, Name, Country, Currency, Timezone) <> ((State.apply _).tupled, State.unapply)
+    def * = (Id, Name, City, State, Country) <> ((PostCode.apply _).tupled, PostCode.unapply)
   }
-  private  val states = TableQuery[StateTable]
-  def getState = {states}
+  private  val postcodes = TableQuery[PostCodeTable]
+  def getPostCode = {postcodes}
   val existing = db.run(MTable.getTables)
 
  // create table schema
   def createTable=
     existing.map( v => {
       val tables = v.map(mt => mt.name.name)
-      if(!tables.contains(states.baseTableRow.tableName))
-        db.run(DBIO.seq(states.schema.create))
+      if(!tables.contains(postcodes.baseTableRow.tableName))
+        db.run(DBIO.seq(postcodes.schema.create))
   })
 
 // Add new row
 def create(req:JsValue): Future[Option[Int]]= db.run {
-    states ++= req.as[Seq[State]]
+    postcodes ++= req.as[Seq[PostCode]]
   }
   // List all rows
-  def read(): Future[Seq[State]] = db.run {
-    states.result
+  def read(): Future[Seq[PostCode]] = db.run {
+    postcodes.result
   }
   // Delete by pk
   def delete(Id: String): Future[Int]  = db.run {
      if(Id !="")
-       states.filter(_.Id ===Id).delete
+       postcodes.filter(_.Id ===Id).delete
      else
-       states.delete
+       postcodes.delete
   }
   def update(req:JsValue): Future[Int]= db.run {
-    states.insertOrUpdate(req.as[State])
+    postcodes.insertOrUpdate(req.as[PostCode])
   }
 }
 

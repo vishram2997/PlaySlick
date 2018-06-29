@@ -7,58 +7,56 @@ import play.api.libs.json._
 import slick.jdbc.meta.MTable
 import scala.concurrent.{ExecutionContext, Future}
 /**
- * A repository for Country.
+ * A repository for AddressType.
  *
  * @param dbConfigProvider The Play db config provider. Play will inject this for you.
 */
 @Singleton
-class Country @Inject() (dbConfigProvider: DatabaseConfigProvider
+class AddressType @Inject() (dbConfigProvider: DatabaseConfigProvider
                          )(implicit ec: ExecutionContext) {
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   import dbConfig._
   import profile.api._
-  case class Country(Id:String ,Name:String ,ISO:String ,Currency:String)
-  object Country {
-    implicit val CountryFormat:OFormat[Country] = Json.format[Country]
+  case class AddressType(Id:String ,Desc:String)
+  object AddressType {
+    implicit val AddressTypeFormat:OFormat[AddressType] = Json.format[AddressType]
   }
 
-  class CountryTable(tag: Tag) extends Table[Country](tag, "country") {
+  class AddressTypeTable(tag: Tag) extends Table[AddressType](tag, "addresstype") {
     def Id = column[String]("Id", O.PrimaryKey, O.Default(""))
-  def Name = column[String]("Name", O.Default(""))
-  def ISO = column[String]("ISO", O.Default(""))
-  def Currency = column[String]("Currency", O.Default(""))
+  def Desc = column[String]("Desc", O.Default(""))
 
-    def * = (Id, Name, ISO, Currency) <> ((Country.apply _).tupled, Country.unapply)
+    def * = (Id, Desc) <> ((AddressType.apply _).tupled, AddressType.unapply)
   }
-  private  val countrys = TableQuery[CountryTable]
-  def getCountry = {countrys}
+  private  val addresstypes = TableQuery[AddressTypeTable]
+  def getAddressType = {addresstypes}
   val existing = db.run(MTable.getTables)
 
  // create table schema
   def createTable=
     existing.map( v => {
       val tables = v.map(mt => mt.name.name)
-      if(!tables.contains(countrys.baseTableRow.tableName))
-        db.run(DBIO.seq(countrys.schema.create))
+      if(!tables.contains(addresstypes.baseTableRow.tableName))
+        db.run(DBIO.seq(addresstypes.schema.create))
   })
 
 // Add new row
 def create(req:JsValue): Future[Option[Int]]= db.run {
-    countrys ++= req.as[Seq[Country]]
+    addresstypes ++= req.as[Seq[AddressType]]
   }
   // List all rows
-  def read(): Future[Seq[Country]] = db.run {
-    countrys.result
+  def read(): Future[Seq[AddressType]] = db.run {
+    addresstypes.result
   }
   // Delete by pk
   def delete(Id: String): Future[Int]  = db.run {
      if(Id !="")
-       countrys.filter(_.Id ===Id).delete
+       addresstypes.filter(_.Id ===Id).delete
      else
-       countrys.delete
+       addresstypes.delete
   }
   def update(req:JsValue): Future[Int]= db.run {
-    countrys.insertOrUpdate(req.as[Country])
+    addresstypes.insertOrUpdate(req.as[AddressType])
   }
 }
 

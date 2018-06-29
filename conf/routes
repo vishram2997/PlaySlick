@@ -4,36 +4,14 @@
 
 # Home page
 #POST    /person                    controllers.PersonController.addPerson
+
 POST    /createSchema               controllers.AppController.createTables
-
-GET     /persons                    controllers.PersonController.getPersons
-POST    /addPerson(:name,:age)      controllers.PersonController.addNew(name:String, age: Int)
-POST    /remove(:id)                controllers.PersonController.deletePerson(id:Long)
-POST    /update(:id,:name,:age)     controllers.PersonController.update(id:Long,name:String, age: Int)
-
-GET     /currencies                 controllers.CurrencyController.read
-POST    /currency/createTable       controllers.CurrencyController.createTable
-POST    /currency/create            controllers.CurrencyController.create
-POST    /currency/update            controllers.CurrencyController.update
-POST    /currency/delete(:id)       controllers.CurrencyController.delete(id:String)
-
-GET     /countries                  controllers.CountryController.read
-POST    /Country/createTable       controllers.CountryController.createTable
-POST    /Country/create            controllers.CountryController.create
-POST    /Country/update            controllers.CountryController.update
-POST    /Country/delete(:id)       controllers.CountryController.delete(id:String)
 
 GET    /Timezones                   controllers.TimezoneController.read
 POST    /Timezone/createTable       controllers.TimezoneController.createTable
-POST    /Timezone/create            controllers.TimezoneController.create
-POST    /Timezone/update            controllers.TimezoneController.update
+POST    /Timezone            controllers.TimezoneController.create
+PUT    /Timezone            controllers.TimezoneController.update
 POST    /Timezone/delete(:id)       controllers.TimezoneController.delete(id:String)
-
-GET    /States                  controllers.StateController.read
-POST    /State/createTable       controllers.StateController.createTable
-POST    /State/create            controllers.StateController.create
-POST    /State/update            controllers.StateController.update
-POST    /State/delete(:id)       controllers.StateController.delete(id:String)
 
 
 # Map static resources from the /public folder to the /assets URL path

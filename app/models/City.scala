@@ -7,59 +7,58 @@ import play.api.libs.json._
 import slick.jdbc.meta.MTable
 import scala.concurrent.{ExecutionContext, Future}
 /**
- * A repository for State.
+ * A repository for City.
  *
  * @param dbConfigProvider The Play db config provider. Play will inject this for you.
 */
 @Singleton
-class State @Inject() (dbConfigProvider: DatabaseConfigProvider
+class City @Inject() (dbConfigProvider: DatabaseConfigProvider
                          )(implicit ec: ExecutionContext) {
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   import dbConfig._
   import profile.api._
-  case class State(Id:String ,Name:String ,Country:String ,Currency:String ,Timezone:String)
-  object State {
-    implicit val StateFormat:OFormat[State] = Json.format[State]
+  case class City(Id:String ,Name:String ,Country:String ,State:String)
+  object City {
+    implicit val CityFormat:OFormat[City] = Json.format[City]
   }
 
-  class StateTable(tag: Tag) extends Table[State](tag, "state") {
+  class CityTable(tag: Tag) extends Table[City](tag, "city") {
     def Id = column[String]("Id", O.PrimaryKey, O.Default(""))
   def Name = column[String]("Name", O.Default(""))
   def Country = column[String]("Country", O.Default(""))
-  def Currency = column[String]("Currency", O.Default(""))
-  def Timezone = column[String]("Timezone", O.Default(""))
+  def State = column[String]("State", O.Default(""))
 
-    def * = (Id, Name, Country, Currency, Timezone) <> ((State.apply _).tupled, State.unapply)
+    def * = (Id, Name, Country, State) <> ((City.apply _).tupled, City.unapply)
   }
-  private  val states = TableQuery[StateTable]
-  def getState = {states}
+  private  val citys = TableQuery[CityTable]
+  def getCity = {citys}
   val existing = db.run(MTable.getTables)
 
  // create table schema
   def createTable=
     existing.map( v => {
       val tables = v.map(mt => mt.name.name)
-      if(!tables.contains(states.baseTableRow.tableName))
-        db.run(DBIO.seq(states.schema.create))
+      if(!tables.contains(citys.baseTableRow.tableName))
+        db.run(DBIO.seq(citys.schema.create))
   })
 
 // Add new row
 def create(req:JsValue): Future[Option[Int]]= db.run {
-    states ++= req.as[Seq[State]]
+    citys ++= req.as[Seq[City]]
   }
   // List all rows
-  def read(): Future[Seq[State]] = db.run {
-    states.result
+  def read(): Future[Seq[City]] = db.run {
+    citys.result
   }
   // Delete by pk
   def delete(Id: String): Future[Int]  = db.run {
      if(Id !="")
-       states.filter(_.Id ===Id).delete
+       citys.filter(_.Id ===Id).delete
      else
-       states.delete
+       citys.delete
   }
   def update(req:JsValue): Future[Int]= db.run {
-    states.insertOrUpdate(req.as[State])
+    citys.insertOrUpdate(req.as[City])
   }
 }
 
